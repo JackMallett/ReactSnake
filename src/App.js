@@ -9,40 +9,22 @@ const columns = 30;
 let speedX = 0
 let speedY = 0
 
-let snakeX = 5
-let snakeY = 4
+let lastSpeedX = 0
+let lastSpeedY = 0
 
-let foodX = 5;
-let foodY = 5;
+let snakeX
+let snakeY
 
-let snakeBody = [[5,4]]
+let foodX = 2;
+let foodY = 4;
+
+let snakeBody = []
 
 let gameOver = false
 
-function changeDirection(e) {
-    if (e.code === "ArrowUp" && speedY !== 1) {
-        // If up arrow key pressed with this condition...
-        // snake will not move in the opposite direction
-        speedX = 0;
-        speedY = -1;
-    }
-    else if (e.code === "ArrowDown" && speedY !== -1) {
-        //If down arrow key pressed
-        speedX = 0;
-        speedY = 1;
-    }
-    else if (e.code === "ArrowLeft" && speedX !== 1) {
-        //If left arrow key pressed
-        speedX = -1;
-        speedY = 0;
-    }
-    else if (e.code === "ArrowRight" && speedX !== -1) {
-        //If Right arrow key pressed
-        speedX = 1;
-        speedY = 0;
-    }
-    console.log(`Changed speed to [${speedX}, ${speedY}]`)
-}
+
+
+
 
 
 
@@ -65,7 +47,36 @@ function Square({isBlue}) {
 
 function Board() {
     const [colors, setColors] = useState(Array(columns * rows).fill("WhiteSquare"))
-    const [blue, setBlue] = useState("WhiteSquare")
+    const [highScore, setHighScore] = useState()
+    let score = 0
+
+    function changeDirection(e) {
+        if (gameOver) {
+            StartGame()
+        }
+        if (e.code === "ArrowUp" && lastSpeedY !== 1) {
+            // If up arrow key pressed with this condition...
+            // snake will not move in the opposite direction
+            speedX = 0;
+            speedY = -1;
+        }
+        else if (e.code === "ArrowDown" && lastSpeedY !== -1) {
+            //If down arrow key pressed
+            speedX = 0;
+            speedY = 1;
+        }
+        else if (e.code === "ArrowLeft" && lastSpeedX !== 1) {
+            //If left arrow key pressed
+            speedX = -1;
+            speedY = 0;
+        }
+        else if (e.code === "ArrowRight" && lastSpeedX !== -1) {
+            //If Right arrow key pressed
+            speedX = 1;
+            speedY = 0;
+        }
+    }
+
     function squareColors() {
         let newColors = Array(columns * rows).fill("WhiteSquare")
         for (let i = 0; i < snakeBody.length; i++) {
@@ -82,49 +93,57 @@ function Board() {
     }
 
 
-    // useEffect(() => {
-    //     placeFood()
-    //     // snakeX = Math.floor(Math.random() * columns)
-    //     // snakeY = Math.floor(Math.random() * rows)
-    //     // snakeBody.push([snakeX, snakeY])
-    //     squareColors();
-    // }, []);
+    useEffect(() => {
+        snakeX = Math.floor(Math.random() * columns)
+        snakeY = Math.floor(Math.random() * rows)
+        snakeBody.push([snakeX,snakeY])
+        placeFood();
+        squareColors();
+        setInterval(move, 1000/5);
+    }, []);
+
 
 
     function move() {
-        console.log("called move")
-        if (gameOver || (speedX === 0 && speedY === 0)) {
+        if (gameOver) {
             return
         }
 
+        if  (speedY !== 0 || speedX !== 0) {
+            snakeX += speedX
+            snakeY += speedY
 
-        snakeX += speedX
-        snakeY += speedY
-
-        snakeBody.push([snakeX, snakeY])
-
-
-        if (snakeX === foodX && snakeY === foodY) {
-            placeFood()
-        } else {
-            snakeBody.shift()
-        }
-        console.log(snakeBody)
-
-
-        squareColors()
-
-
-        if (snakeX > columns || snakeX < 0 || snakeY > rows || snakeY < 0) {
-            gameOver = true
-            alert("gameover")
-        }
-
-        for (let i = 0; i < snakeBody.length - 1; i++) {
-            if (snakeX === snakeBody[i][0] && snakeY === snakeBody[i][1]) {
-                gameOver = true;
-                alert("gameover");
+            lastSpeedX = speedX
+            lastSpeedY = speedY
+            
+            if (snakeX === foodX && snakeY === foodY) {
+                placeFood()
+            } else {
+                snakeBody.shift()
             }
+            console.log(snakeBody)
+
+            snakeBody.push([snakeX, snakeY])
+
+
+
+
+            if (snakeX > columns || snakeX < 0 || snakeY > rows || snakeY < 0) {
+                gameOver = true
+
+                setHighScore(snakeBody.length)
+            }
+
+            for (let i = 0; i < snakeBody.length - 1; i++) {
+                if (snakeX === snakeBody[i][0] && snakeY === snakeBody[i][1]) {
+                    gameOver = true;
+                    setHighScore(snakeBody.length)
+                }
+            }
+            if (!gameOver) {
+                squareColors()
+            }
+
         }
 
     }
@@ -134,18 +153,38 @@ function Board() {
     });
 
 
-    setTimeout(move, 1000/5)
+    function StartGame() {
+        if (gameOver) {
+            placeFood();
+            snakeX = Math.floor(Math.random() * columns)
+            snakeY = Math.floor(Math.random() * rows)
+            speedY = 0
+            speedX = 0
+            lastSpeedY = 0
+            lastSpeedX = 0
+            snakeBody = []
+            snakeBody.push([snakeX,snakeY])
+            squareColors();
+            gameOver = false
+        }
+
+    }
+
 
     return (
         <>
         <header className={"App-header"}>
+            <div>
+                <h1>{!gameOver ? "Play Snake" : "Game Over!"}</h1>
+                <h2>Score: {highScore}</h2>
+                {gameOver && <button onClick={StartGame}>Play Again</button>}
+            </div>
             <div className={"Row"}>
                 {Array.from({ length: rows * columns }, (_, index) => (
                     <Square key={index} isBlue={colors[index]}/>
                 ))}
             </div>
 
-            <button onClick={squareColors}>Press me</button>
 
         </header>
         </>
