@@ -11,3 +11,58 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.Row {
+  display: grid;
+  grid-template-columns: repeat(30, 20px) ;
+  grid-template-rows: repeat(20, 20px);
+}
+
+.BlueSquare {
+  box-sizing: border-box; /* Important to include padding and border in width/height */
+  padding: 0;
+  /*height: 50px;*/
+  /*width: 50px;*/
+  display: inline-block;
+  color: #61dafb;
+
+  background-color: lightgreen;
+  /*border-spacing: 10px;*/
+}
+
+.WhiteSquare {
+  box-sizing: border-box; /* Important to include padding and border in width/height */
+  padding: 0;
+  /*height: 50px;*/
+  /*width: 50px;*/
+  background-color: white;
+
+  display: inline-block;
+  /*background-color: #61dafb;*/
+  /*border-spacing: 10px;*/
+}
+
+.YellowSquare {
+  box-sizing: border-box; /* Important to include padding and border in width/height */
+  padding: 0;
+  /*height: 50px;*/
+  /*width: 50px;*/
+  background-color: yellow;
+
+  display: inline-block;
+  /*background-color: #61dafb;*/
+  /*border-spacing: 10px;*/
+}
+
+.Row1 {
+  display: grid;
+  grid-template-columns: 50px 50px 50px;
+}
+
+.Square1 {
+  box-sizing: border-box; /* Important to include padding and border in width/height */
+  padding: 0;
+  height: 50px;
+  width: 50px;
+  display: block;
+}
